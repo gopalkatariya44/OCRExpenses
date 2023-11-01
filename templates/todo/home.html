@@ -4,65 +4,118 @@
 {{ super() }}
 {% endblock %}
 {% block content %}
-<div class="container">
-    <div class="card text-center">
-        <div class="card-header">
-            Your Todos
-        </div>
-        <div class="card-body">
-            <h5 class="card-title">List of your Todos!</h5>
-            <p class="card-text">Information regarding stuff that needs to be complete</p>
-            <a href="add-todo" class="btn btn-primary">Add a new Todo!</a>
-            <br>
-            <br>
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Actions</th>
-                </tr>
-                </thead>
+    <div class="container">
+        <div class="card text-center">
+           <a class="card-header" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+            <div class="card-header">
+            OCR Expense
+            </div>  </a>
+            <div class="collapse" id="collapseExample">
+            <div class="card card-body">
+                <div class="card-body">
+                    <br>
+                    <div class="container">
+                      <div class="row">
+                            <span class="border">
+                                <br>
+                                <p align="start">&nbsp;&nbsp;&nbsp;&nbsp;Add expense using bill images.</p>
+                            <div class="col-sm">
+                                <form action="/expense-temp/add" method="post" enctype="multipart/form-data">
+                                    <input type="file" name="file" accept="image/png, image/jpeg, image/jpg">
+                                    <input type="submit" value="Upload">
+                                </form>
+                            </div>
+                                <br>
+                            </span>
+                        <div class="col-sm">
+                      </div>
+                    </div>
+                    <br>
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for e in expense_temp %}
+                        <tr class="pointer">
+                            <td>{{loop.index}}</td>
+                            <td>{{e.title}}</td>
+                            <td>{{e.amount}}</td>
+                            <td>
+                                <button onclick="window.location.href='expense-temp/{{e.id}}'"
+                                        type="button" class="btn btn-info">Modify & Add
+                                </button>
+                                <button onclick="window.location.href='expense-temp/delete/{{e.id}}'"
+                                        type="button" class="btn btn-danger">Delete
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if expense_temp|length == 0 %}
+                    <p class="card-text">No analyzed expense found! select image and analyze some.</p>
+                    {% endif %}
+                </div>
 
-                <tbody>
-                {% for todo in todos %}
-                {% if todo.complete == false %}
-                <tr class="pointer">
-                    <td>{{loop.index}}</td>
-                    <td>{{todo.title}}</td>
-                    <td>
-                        <button onclick="window.location.href='edit-todo/{{todo.id}}'"
-                                type="button" class="btn btn-info">Edit
-                        </button>
-                        &nbsp;
-                        <button onclick="window.location.href='complete/{{todo.id}}'"
-                                type="button" class="btn btn-success">Complete
-                        </button>
-                    </td>
-                </tr>
-                {% else %}
-                <tr class="pointer alert alert-success">
-                    <td>{{loop.index}}</td>
-                    <td class="strike-through-td">{{todo.title}}</td>
-                    <td>
-                        <button onclick="window.location.href='edit-todo/{{todo.id}}'"
-                                type="button" class="btn btn-info">Edit
-                        </button>
-                        &nbsp;
-                        <button onclick="window.location.href='complete/{{todo.id}}'"
-                                type="button" class="btn btn-success">&nbsp;&nbsp;&nbsp;Undo&nbsp;&nbsp;&nbsp;&nbsp;
-                        </button>
-                    </td>
-                </tr>
+            </div>
+            </div>
+
+        </div>
+
+    </div>
+    <br>
+    <div class="container">
+        <div class="card text-center">
+            <div class="card-header">
+                Your Expense
+            </div>
+            <div class="card-body">
+                <h4>Total: {{total}}</h4>
+                <br>
+                </div>
+                  <div class="col-sm">
+                    <a href="add-todo" class="btn btn-primary">Add Expense</a>
+                </div>
+                <br>
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for todo in todos %}
+                    <tr class="pointer">
+                        <td>{{loop.index}}</td>
+                        <td>{{todo.title}}</td>
+                        <td>{{todo.amount}}</td>
+                        <td>
+                            <button onclick="window.location.href='edit-todo/{{todo.id}}'"
+                                    type="button" class="btn btn-info">Edit
+                            </button>
+                            &nbsp;
+                            <button onclick="window.location.href='delete/{{todo.id}}'"
+                                    type="button" class="btn btn-danger">Delete
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% if todos|length == 0 %}
+                <p class="card-text">No todos found! Add some.</p>
                 {% endif %}
-                {% endfor %}
-                </tbody>
-            </table>
-            {% if todos|length == 0 %}
-            <p class="card-text">No todos found! Add some.</p>
-            {% endif %}
+            </div>
         </div>
     </div>
-</div>
-
+    <br>
 {% endblock %}

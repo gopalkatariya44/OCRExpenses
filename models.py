@@ -18,6 +18,7 @@ class Users(Base):
     address_id = Column(Integer, ForeignKey('address.id'), nullable=True)
 
     todos = relationship('Todos', back_populates='owner')
+    expense_temp = relationship('ExpenseTemp', back_populates='owner')
     address = relationship('Address', back_populates='user_address')
 
 
@@ -31,6 +32,19 @@ class Todos(Base):
     owner_id = Column(Integer, ForeignKey('users.id'))
 
     owner = relationship('Users', back_populates='todos')
+
+
+class ExpenseTemp(Base):
+    __tablename__ = 'expense_temp'
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(225))
+    amount = Column(Double)
+    description = Column(String(225), nullable=True)
+    is_added = Column(Boolean, default=False)
+    owner_id = Column(Integer, ForeignKey('users.id'))
+
+    owner = relationship('Users', back_populates='expense_temp')
 
 
 class Address(Base):

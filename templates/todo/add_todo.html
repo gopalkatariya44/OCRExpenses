@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Add Todo{% endblock %}
+{% block title %}Add Expense{% endblock %}
 {% block head %}
 {{ super() }}
 {% endblock %}
@@ -7,7 +7,7 @@
 <div class="container">
     <div class="card">
         <div class="card-header">
-            Make a new todo
+            Make a new expense
         </div>
         <div class="card-body">
             <form method="POST">
@@ -16,20 +16,14 @@
                     <input type="text" class="form-control" name="title" required>
                 </div>
                 <div class="form-group">
+                    <label>Amount</label>
+                    <input type="number" class="form-control" name="amount" required>
+                </div>
+                <div class="form-group">
                     <label>Description</label>
                     <textarea type="text" class="form-control" rows="3" name="description" required></textarea>
                 </div>
-                <div class="form-group">
-                    <label>Priority</label>
-                    <select name="priority" class="form-control">
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Add new todo</button>
+                <button type="submit" class="btn btn-primary">Add new expense</button>
             </form>
         </div>
     </div>

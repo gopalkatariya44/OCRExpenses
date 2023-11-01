@@ -1,5 +1,6 @@
 import sys
 
+import sqlalchemy
 from fastapi import Depends, HTTPException, APIRouter, Request, Response
 from passlib.context import CryptContext
 from pydantic import BaseModel
@@ -9,6 +10,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 import models
+from config import settings
 from database import engine, SessionLocal
 from models import Users
 from jose import JWTError, jwt
@@ -20,10 +22,6 @@ from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 
 sys.path.append('..')
-
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 
 class CreateUser(BaseModel):
@@ -109,7 +107,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
 
@@ -118,7 +116,7 @@ async def get_current_user(request: Request):
         token = request.cookies.get('access_token')
         if token is None:
             return None
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.ALGORITHM])
         username: str = payload.get("sub")
         user_id: int = payload.get("id")
         if username is None or user_id is None:
@@ -147,7 +145,7 @@ async def login_for_access_token(response: Response,
     if not user:
         return False  # token_exception()
 
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.username, 'id': user.id},
         expires_delta=access_token_expires)
@@ -200,23 +198,28 @@ async def register_page(request: Request):
 
 @router.post('/register')
 async def create_new_user(request: Request, db: Session = Depends(get_db)):
-    form = RegisterForm(request)
-    await form.create_register_form()
-    user = Users()
-    user.email = form.email
-    user.username = form.username
-    user.first_name = form.firstname
-    user.last_name = form.lastname
-    user.hashed_password = get_password_hash(form.password)
-    # user.phone_number = form.phonenumber
-    user.is_active = True
+    try:
+        form = RegisterForm(request)
+        await form.create_register_form()
+        user = Users()
+        user.email = form.email
+        user.username = form.username
+        user.first_name = form.firstname
+        user.last_name = form.lastname
+        user.hashed_password = get_password_hash(form.password)
+        # user.phone_number = form.phonenumber
+        user.is_active = True
 
-    db.add(user)
-    db.commit()
+        db.add(user)
+        db.commit()
 
-    msg = 'User successfully created'
-    response = templates.TemplateResponse('user/login.html', {'request': request, 'msg': msg})
-    return response
+        msg = 'User successfully created'
+        response = templates.TemplateResponse('user/login.html', {'request': request, 'msg': msg})
+        return response
+    except sqlalchemy.exc.IntegrityError:
+        msg = 'This username or email already exist.'
+        if user is not None:
+            return templates.TemplateResponse('user/register.html', {'request': request, 'msg': msg})
 
 
 def get_user_exception():
