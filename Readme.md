@@ -74,8 +74,9 @@
     ```
 > **IMPORTANT**:
   > - Prepare **.env** file
-  > - Create bucket in your s3
-  > - Allow IAM user to full access of S3 and Textract
+  > - Create a bucket in your s3
+    > - for first-time run uncomment [this line](https://github.com/gopalkatariya44/OCRExpenses/blob/main/ocr.py#L65)
+  > - Allow IAM user to have full access to S3 and Textract
   
 - Run the Web application
     ```
