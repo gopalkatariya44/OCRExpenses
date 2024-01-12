@@ -82,4 +82,4 @@
     python main.py
     ```
     > **Note**:
-    > - navigate to  `http://localhost:8000`
+    > - navigate to the  `http://localhost:8000`
